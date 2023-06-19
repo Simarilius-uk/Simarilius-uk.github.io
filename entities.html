@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction</title>
+        <title>Entities</title>
 
 
         <!-- Custom HTML head -->
@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html" class="active">Introduction</a></li><li class="chapter-item expanded "><a href="sectors/sectors.html"><strong aria-hidden="true">1.</strong> Sectors</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sectors/streamingsector.html"><strong aria-hidden="true">1.1.</strong> File Format</a></li><li class="chapter-item expanded "><a href="sectors/naming_chaos.html"><strong aria-hidden="true">1.2.</strong> Names, logic and lack thereof</a></li><li class="chapter-item expanded "><a href="sectors/nodetypes.html"><strong aria-hidden="true">1.3.</strong> Node types</a></li></ol></li><li class="chapter-item expanded "><a href="entities.html"><strong aria-hidden="true">2.</strong> Entities</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Introduction</a></li><li class="chapter-item expanded "><a href="sectors/sectors.html"><strong aria-hidden="true">1.</strong> Sectors</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sectors/streamingsector.html"><strong aria-hidden="true">1.1.</strong> File Format</a></li><li class="chapter-item expanded "><a href="sectors/naming_chaos.html"><strong aria-hidden="true">1.2.</strong> Names, logic and lack thereof</a></li><li class="chapter-item expanded "><a href="sectors/nodetypes.html"><strong aria-hidden="true">1.3.</strong> Node types</a></li></ol></li><li class="chapter-item expanded "><a href="entities.html" class="active"><strong aria-hidden="true">2.</strong> Entities</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -144,32 +144,22 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="sims-random-ramblings"><a class="header" href="#sims-random-ramblings">Sims Random Ramblings</a></h1>
-<p>Wanted somewhere to record some thoughts in a way that was not proper guides for the wiki, where I can ramble and get technical without it being an issue. Expect chatty informal info dumps about mainly Cyberpunk files and importing them to Blender. 
-This isnt meant to be a definitive guide to CP2077 formats, its the info I needed/worked out trying to get stuff into blender. Occasional rants are likely, especially if I try to do anything in c#</p>
-<p>I will be lazy, and refer to the game Cyberpunk 2077 as cyberpunk or cp2077, unless I specifically say I'm talking about the board game or something else its safe to assume I mean the game.</p>
-<h2 id="links"><a class="header" href="#links">Links</a></h2>
-<p>My Github is <a href="https://github.com/Simarilius-uk/">here</a></p>
-<p>Things of use for cyberpunk/Blender stuff are:</p>
-<ul>
-<li><a href="https://github.com/Simarilius-uk/CP2077_BlenderScripts">CP2077_BlenderScripts</a> </li>
-<li><a href="https://colab.research.google.com/github/Simarilius-uk/sectorStuff/blob/main/AllBlocks_colab_w_streamingblock.ipynb">All blocks jupyter notebook on colab</a></li>
-</ul>
-<h2 id="guides-more-formal"><a class="header" href="#guides-more-formal">Guides (more formal):</a></h2>
-<p><a href="https://wiki.redmodding.org/wolvenkit/modding-community/world-editing/exporting-streaming-sectors-to-blender">Exporting Streaming Sectors</a></p>
-<p><a href="https://wiki.redmodding.org/wolvenkit/modding-community/exporting-to-blender">Exporting meshes and characters</a>
-<a href="https://wiki.redmodding.org/wolvenkit/modding-community/exporting-to-blender/exporting-rigs-and-anims">Exporting Rigs and Anims</a>
-<a href="https://wiki.redmodding.org/wolvenkit/modding-community/exporting-to-blender/exporting-vehicles">Exporting Vehicles</a></p>
-<p>Feel free to ping me (simarilius) any q on discord on the <a href="https://discord.com/invite/Epkq79kd96">CP2077 modding server</a>.</p>
+                        <h1 id="entities"><a class="header" href="#entities">Entities</a></h1>
+<p>Entities are files that define an in game item that uses more than 1 mesh file. People, vehicles, vendingmachines, weapons, all of those should*<sup class="footnote-reference"><a href="#note">1</a></sup> have entities. </p>
+<p>Theres a couple of ways they can be defined, and the wiki already explains a bunch of it with nice diagrams and shit for if your modding, I'm just gonna talk about the fun stuff I've run into while doing the importer.</p>
+<p>They have 2 important arrays, the <em>appearances</em> and the <em>components</em>. There dont have to be appearances, but most things have them. Basically if theres multiple variations of something chances are theres only 1 entity file and it just has a bunch of appearances defined. So for instance the vending machines, theres 1 ent with about 30 appearances called up. The entries in the appearances are short and sweet, they have a name, an appearanceName and a depotPath to an appearance file that the actual good stuff is in. </p>
+<p>The components have the bits that make up the entity. if it doesnt have any appearances defined this will contain everything. If it does have appearances there will still be entries in the components, but its generally non mesh stuff that makes the game work (interaction bits, ui definitions, sounds) and the main list of bits will be in the appearance file components list.</p>
+<p>the appearance files have an appearances array, but this has detail in it. each appearance has a components list that like the one in the entity file contains the meshes and stuff that make up the thing.</p>
+<p><sup class="footnote-reference"><a href="#note">1</a></sup> should doesnt mean does, some of the weapons only have apps, not worked out how that works.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-
-                            <a rel="next" href="sectors/sectors.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
+                            <a rel="prev" href="sectors/nodetypes.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
                             </a>
+
 
                         <div style="clear: both"></div>
                     </nav>
@@ -177,10 +167,10 @@ This isnt meant to be a definitive guide to CP2077 formats, its the info I neede
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-
-                    <a rel="next" href="sectors/sectors.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
+                    <a rel="prev" href="sectors/nodetypes.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
                     </a>
+
             </nav>
 
         </div>

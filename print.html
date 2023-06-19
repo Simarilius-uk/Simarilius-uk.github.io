@@ -3,7 +3,8 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction</title>
+        <title></title>
+        <meta name="robots" content="noindex" />
 
 
         <!-- Custom HTML head -->
@@ -83,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html" class="active">Introduction</a></li><li class="chapter-item expanded "><a href="sectors/sectors.html"><strong aria-hidden="true">1.</strong> Sectors</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sectors/streamingsector.html"><strong aria-hidden="true">1.1.</strong> File Format</a></li><li class="chapter-item expanded "><a href="sectors/naming_chaos.html"><strong aria-hidden="true">1.2.</strong> Names, logic and lack thereof</a></li><li class="chapter-item expanded "><a href="sectors/nodetypes.html"><strong aria-hidden="true">1.3.</strong> Node types</a></li></ol></li><li class="chapter-item expanded "><a href="entities.html"><strong aria-hidden="true">2.</strong> Entities</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Introduction</a></li><li class="chapter-item expanded "><a href="sectors/sectors.html"><strong aria-hidden="true">1.</strong> Sectors</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sectors/streamingsector.html"><strong aria-hidden="true">1.1.</strong> File Format</a></li><li class="chapter-item expanded "><a href="sectors/naming_chaos.html"><strong aria-hidden="true">1.2.</strong> Names, logic and lack thereof</a></li><li class="chapter-item expanded "><a href="sectors/nodetypes.html"><strong aria-hidden="true">1.3.</strong> Node types</a></li></ol></li><li class="chapter-item expanded "><a href="entities.html"><strong aria-hidden="true">2.</strong> Entities</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -161,15 +162,34 @@ This isnt meant to be a definitive guide to CP2077 formats, its the info I neede
 <a href="https://wiki.redmodding.org/wolvenkit/modding-community/exporting-to-blender/exporting-rigs-and-anims">Exporting Rigs and Anims</a>
 <a href="https://wiki.redmodding.org/wolvenkit/modding-community/exporting-to-blender/exporting-vehicles">Exporting Vehicles</a></p>
 <p>Feel free to ping me (simarilius) any q on discord on the <a href="https://discord.com/invite/Epkq79kd96">CP2077 modding server</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="streaming-sectors-what-are-they-how-do-they-work"><a class="header" href="#streaming-sectors-what-are-they-how-do-they-work">Streaming Sectors, what are they, how do they work?</a></h1>
+<p>Streaming sectors define the map for cyberpunk, they tell the engine where to put stuff, what should have collisions, what should be interactive. They contain pointers to things that define the people, the traffic, the weather.</p>
+<p>All these things are defined in 2 main sections, the <strong>nodes</strong> and the <strong>nodeData</strong>. </p>
+<h2 id="nodes"><a class="header" href="#nodes">nodes</a></h2>
+<p>The <em>nodes</em><sup class="footnote-reference"><a href="#note">1</a></sup> define the what, meshes, lights, entities, people, its a big list of discrete nodes defining enough info about something for the engine to spawn it. There isnt a discrete id type number, but the nodes can be taken to be a numbered list in the order of definition</p>
+<h2 id="nodedata"><a class="header" href="#nodedata">nodeData</a></h2>
+<p>The nodeData contains all the where, each node inside the nodeData has a nodeIndex which points back to the <em>nodes</em>
+on the simplest node types these nodeData nodes have the postion/orientation/scale info, which mesh appearance to use etc. The more complicated ones get funky, but we'll get to that later.</p>
+<h2 id="other-bits"><a class="header" href="#other-bits">other bits</a></h2>
+<p>Of course theres more to it than that, sectors have nodeRefs, which links stuff in to quests, they have variants, that let there be multiple versions of a location so the world can change after V swings by and clears out a gang for instance. 
+I've not dealt with any of that in the sector import/export yet, so havent dug into it too far, the 2 types of nodes cover pretty much everything I need to do.</p>
+<p><sup class="footnote-reference"><a href="#note">1</a></sup> I'm going to put the nodes in italics when I refer to them, as talking about nodeData nodes vs <em>nodes</em> nodes gets really confusing too easily.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="file-format"><a class="header" href="#file-format">File Format</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="names-logic-and-lack-thereof"><a class="header" href="#names-logic-and-lack-thereof">Names, logic and lack thereof</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="node-types"><a class="header" href="#node-types">Node types</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="entities"><a class="header" href="#entities">Entities</a></h1>
+<p>Entities are files that define an in game item that uses more than 1 mesh file. People, vehicles, vendingmachines, weapons, all of those should*<sup class="footnote-reference"><a href="#note">1</a></sup> have entities. </p>
+<p>Theres a couple of ways they can be defined, and the wiki already explains a bunch of it with nice diagrams and shit for if your modding, I'm just gonna talk about the fun stuff I've run into while doing the importer.</p>
+<p>They have 2 important arrays, the <em>appearances</em> and the <em>components</em>. There dont have to be appearances, but most things have them. Basically if theres multiple variations of something chances are theres only 1 entity file and it just has a bunch of appearances defined. So for instance the vending machines, theres 1 ent with about 30 appearances called up. The entries in the appearances are short and sweet, they have a name, an appearanceName and a depotPath to an appearance file that the actual good stuff is in. </p>
+<p>The components have the bits that make up the entity. if it doesnt have any appearances defined this will contain everything. If it does have appearances there will still be entries in the components, but its generally non mesh stuff that makes the game work (interaction bits, ui definitions, sounds) and the main list of bits will be in the appearance file components list.</p>
+<p>the appearance files have an appearances array, but this has detail in it. each appearance has a components list that like the one in the entity file contains the meshes and stuff that make up the thing.</p>
+<p><sup class="footnote-reference"><a href="#note">1</a></sup> should doesnt mean does, some of the weapons only have apps, not worked out how that works.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
 
-                            <a rel="next" href="sectors/sectors.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -178,9 +198,6 @@ This isnt meant to be a definitive guide to CP2077 formats, its the info I neede
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
 
-                    <a rel="next" href="sectors/sectors.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
             </nav>
 
         </div>
@@ -203,6 +220,11 @@ This isnt meant to be a definitive guide to CP2077 formats, its the info I neede
 
         <!-- Custom JS scripts -->
 
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
 
     </div>
     </body>
